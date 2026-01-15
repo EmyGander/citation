@@ -1,54 +1,182 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Document</title>
+	<title>Citation</title>
+
 	<style>
-		@import url('https://fonts.googleapis.com/css2?family=Limelight&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Public+Sans:ital,wght@0,100..900;1,100..900&family=Tagesschrift&display=swap');
+		@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
 
-		/*Typo*/
 		body{
-			font-family: "Poppins", sans-serif;
-		}
-		h1{
-			font-size: 8vw;
-			letter-spacing: -0.02em;
-		}
-
-
-
-
-		/* Couleur */
-		body{
-						background-color: pink;
-			color: brown;
-		}
-
-
-
-		/* mise en page */
-		body{
-			min-height: 100vh;
+			margin: 0;
+			padding: 0;
+			font-family: "Mont", sans-serif;
+			background-color: black;
+			color: white;
 			display: flex;
-			justify-content: center;
-			align-items: center;
 			flex-direction: column;
+			align-items: center;
+			min-height: 100vh;
+			overflow-x: hidden;
 		}
+
+		/* HOME */
+		.home-btn{
+			position: absolute;
+			top: 20px;
+			right: 30px;
+			font-size: 20px;
+			font-weight: 600;
+			text-decoration: none;
+			color: white;
+		}
+
+		/* Bouton rond */
+		.audio-btn{
+			position: absolute;
+			top: 20px;
+			left: 30px;
+			width: 55px;
+			height: 55px;
+			border-radius: 50%;
+			overflow: hidden;
+			cursor: pointer;
+			border: 2px solid white;
+			background: black;
+			z-index: 10;
+		}
+		.audio-btn img{
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+		}
+
+		/* ROTATION DU BOUTON (3 SECONDES) */
+		.audio-btn.playing{
+			animation: spinBtn 3s linear infinite;
+		}
+		@keyframes spinBtn{
+			from { transform: rotate(0deg); }
+			to   { transform: rotate(360deg); }
+		}
+
+		/* Halo (inchangé) */
+		.audio-btn.playing::after{
+			content: "";
+			position: absolute;
+			top: -8px;
+			left: -8px;
+			width: 70px;
+			height: 70px;
+			border-radius: 50%;
+			border: 3px solid rgba(255,255,255,0.6);
+			animation: rotateHalo 1.3s linear infinite;
+		}
+		@keyframes rotateHalo{
+			from{ transform: rotate(0deg); }
+			to{ transform: rotate(360deg); }
+		}
+
+		/* Texte */
 		h1{
-			max-width: 15ch;
+			font-size: clamp(28px, 5vw, 80px);
+			width: 90%;
+			max-width: 900px;
 			text-align: center;
+			line-height: 1.1;
+			margin-top: 120px;
+			margin-bottom: 40px;
 		}
 
+		/* Image */
+		.image-container{
+			width: 90%;
+			max-width: 700px;
+			overflow: hidden;
+			border-radius: 25px;
+			margin-bottom: 40px;
+		}
+		.image-container img{
+			width: 100%;
+			display: block;
+		}
 
-		body{
-			background-image: url( "INTERSTELLAR.jpeg");
-			background-size: cover;
+		/* Icônes qui tombent */
+		.snowflake{
+			position: fixed;
+			top: -50px;
+			color: white;
+			opacity: 0.8;
+			pointer-events: none;
+			animation: fall linear forwards;
+		}
+		@keyframes fall{
+			to{
+				transform: translateY(110vh);
+				opacity: 0;
+			}
 		}
 	</style>
 </head>
+
 <body>
-	<h1>"They didn't bring us here to change the past"</h1>
-	<p>- Tars</p>
+
+	<!-- Bouton -->
+	<div class="audio-btn" id="toggleButton">
+		<img src="_IN/LAMANO.png" alt="">
+	</div>
+
+	<a href="index.html" class="home-btn">HOME</a>
+
+	<h1>“L.A M.A.N.O RIEN A TTER-GRA BANDE DE HAINEUX”</h1>
+	<p>- LA MANO 1.9</p>
+
+	<div class="image-container">
+		<img src="_IN/LAMANO.png" alt="">
+	</div>
+
+	<!-- Audio -->
+	<audio id="audioPlayer" src="_SON/La-Mano-1.9-Canon.mp3"></audio>
+
+	<script>
+		const btn = document.getElementById("toggleButton");
+		const audio = document.getElementById("audioPlayer");
+
+		let active = false;
+		let snowInterval;
+
+		function createSnowflake(){
+			const flake = document.createElement("div");
+			flake.className = "snowflake";
+			flake.innerHTML = "";
+			flake.style.left = Math.random() * window.innerWidth + "px";
+			flake.style.fontSize = 12 + Math.random() * 20 + "px";
+			flake.style.animationDuration = 3 + Math.random() * 4 + "s";
+			document.body.appendChild(flake);
+
+			setTimeout(() => flake.remove(), 7000);
+		}
+
+		btn.addEventListener("click", () => {
+			if(!active){
+				audio.currentTime = 0;
+				audio.play();
+
+				snowInterval = setInterval(createSnowflake, 200);
+				btn.classList.add("playing");
+				active = true;
+			} else {
+				audio.pause();
+				audio.currentTime = 0;
+
+				clearInterval(snowInterval);
+				document.querySelectorAll(".snowflake").forEach(f => f.remove());
+				btn.classList.remove("playing");
+				active = false;
+			}
+		});
+	</script>
+
 </body>
 </html>

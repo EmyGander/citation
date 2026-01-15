@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Citation</title>
+
+	<style>
+		@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+		body{
+			margin: 0;
+			padding: 0;
+			font-family: "Poppins", sans-serif;
+			background-color: black;
+			color: white;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			min-height: 100vh;
+			overflow-x: hidden;
+		}
+
+		/* HOME */
+		.home-btn{
+			position: absolute;
+			top: 20px;
+			right: 30px;
+			font-size: 20px;
+			font-weight: 600;
+			text-decoration: none;
+			color: white;
+		}
+
+		/* Bouton rond */
+		.audio-btn{
+			position: absolute;
+			top: 20px;
+			left: 30px;
+			width: 55px;
+			height: 55px;
+			border-radius: 50%;
+			overflow: hidden;
+			cursor: pointer;
+			border: 2px solid white;
+			background: black;
+			z-index: 10;
+			transition: transform 0.3s linear;
+		}
+		.audio-btn img{
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+		}
+
+		/* Rotation bouton */
+		.audio-btn.playing{
+			animation: rotateButton 3s linear infinite;
+		}
+		@keyframes rotateButton{
+			from{ transform: rotate(0deg); }
+			to{ transform: rotate(360deg); }
+		}
+
+		/* Texte */
+		h1{
+			font-size: clamp(28px, 5vw, 80px);
+			width: 90%;
+			max-width: 900px;
+			text-align: center;
+			line-height: 1.1;
+			margin-top: 120px;
+			margin-bottom: 40px;
+		}
+
+		/* Image */
+		.image-container{
+			width: 90%;
+			max-width: 700px;
+			overflow: hidden;
+			border-radius: 25px;
+			margin-bottom: 40px;
+		}
+		.image-container img{
+			width: 100%;
+			display: block;
+		}
+
+		/* Icônes qui tombent */
+		.snowflake{
+			position: fixed;
+			top: -50px;
+			color: white;
+			opacity: 0.8;
+			pointer-events: none;
+			animation: fall linear forwards;
+		}
+		@keyframes fall{
+			to{
+				transform: translateY(110vh);
+				opacity: 0;
+			}
+		}
+	</style>
+</head>
+
+<body>
+
+	<!-- Bouton -->
+	<div class="audio-btn" id="toggleButton">
+		<img src="_IN/THEODORA.jpeg" alt="">
+	</div>
+
+	<a href="index.html" class="home-btn">HOME</a>
+
+	<h1>“C'EST MOI BOSS LADY, J'AI TOUT PAYÉ, NO CRÉDIT"</h1>
+	<p>- Théodora</p>
+
+	<div class="image-container">
+		<img src="_IN/THEODORA.jpeg" alt="">
+	</div>
+
+	<!-- Audio -->
+	<audio id="audioPlayer" src="_SON/theodora_fashion.mp3"></audio>
+
+	<script>
+		const btn = document.getElementById("toggleButton");
+		const audio = document.getElementById("audioPlayer");
+
+		let active = false;
+		let snowInterval;
+
+		function createSnowflake(){
+			const flake = document.createElement("div");
+			flake.className = "snowflake";
+			flake.innerHTML = ""; // pas d’icônes
+			flake.style.left = Math.random() * window.innerWidth + "px";
+			flake.style.fontSize = 12 + Math.random() * 20 + "px";
+			flake.style.animationDuration = 3 + Math.random() * 4 + "s";
+			document.body.appendChild(flake);
+
+			setTimeout(() => flake.remove(), 7000);
+		}
+
+		btn.addEventListener("click", () => {
+			if(!active){
+				audio.currentTime = 0;
+				audio.play();
+
+				snowInterval = setInterval(createSnowflake, 200);
+				btn.classList.add("playing"); // bouton tourne
+				active = true;
+			} else {
+				audio.pause();
+				audio.currentTime = 0;
+
+				clearInterval(snowInterval);
+				document.querySelectorAll(".snowflake").forEach(f => f.remove());
+				btn.classList.remove("playing"); // arrêt rotation
+				active = false;
+			}
+		});
+	</script>
+
+</body>
+</html>

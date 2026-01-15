@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Citation</title>
+
+	<style>
+		@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+		body{
+			margin: 0;
+			padding: 0;
+			font-family: "Poppins", sans-serif;
+			background-color: black;
+			color: white;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			min-height: 100vh;
+			overflow-x: hidden;
+		}
+
+		/* HOME */
+		.home-btn{
+			position: absolute;
+			top: 20px;
+			right: 30px;
+			font-size: 20px;
+			font-weight: 600;
+			text-decoration: none;
+			color: white;
+		}
+
+		/* Bouton audio */
+		.audio-btn{
+			position: absolute;
+			top: 20px;
+			left: 30px;
+			width: 55px;
+			height: 55px;
+			border-radius: 50%;
+			overflow: hidden;
+			cursor: pointer;
+			border: 2px solid white;
+			background: black;
+			z-index: 10;
+		}
+		.audio-btn img{
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+		}
+
+		/* 🔄 ROTATION 3 SECONDES */
+		.audio-btn.playing{
+			animation: spinBtn 3s linear infinite;
+		}
+		@keyframes spinBtn{
+			from { transform: rotate(0deg); }
+			to   { transform: rotate(360deg); }
+		}
+
+		/* Halo (inchangé) */
+		.audio-btn.playing::after{
+			content: "";
+			position: absolute;
+			top: -8px;
+			left: -8px;
+			width: 70px;
+			height: 70px;
+			border-radius: 50%;
+			border: 3px solid blue;
+			animation: rotateHalo 1.3s linear infinite;
+		}
+		@keyframes rotateHalo{
+			from{ transform: rotate(0deg); }
+			to{ transform: rotate(360deg); }
+		}
+
+		/* Texte */
+		h1{
+			font-size: clamp(28px, 5vw, 80px);
+			width: 90%;
+			max-width: 900px;
+			text-align: center;
+			line-height: 1.1;
+			margin-top: 120px;
+			margin-bottom: 40px;
+		}
+
+		/* Image / vidéo */
+		.image-container{
+			width: 90%;
+			max-width: 700px;
+			border-radius: 25px;
+			margin-bottom: 40px;
+			position: relative;
+			overflow: hidden;
+		}
+
+		.image-container img,
+		.image-container video{
+			width: 100%;
+			display: block;
+		}
+
+		.image-container video{
+			display: none;
+		}
+
+		/* Bouton invisible */
+		#shazamButton{
+			position: absolute;
+			top: 240px;
+			left: 240px;
+			width: 198px;
+			height: 198px;
+			cursor: pointer;
+			background: rgba(0,0,0,0);
+			border-radius: 50%;
+		}
+	</style>
+</head>
+
+<body>
+
+	<!-- Bouton audio -->
+	<div class="audio-btn" id="audioButton">
+		<img src="_IN/THEODORA.jpeg" alt="">
+	</div>
+
+	<a href="index.html" class="home-btn">HOME</a>
+
+	<h1>“JE SUIS COMME CE SON QUE T'AURAIS PAS SHAZAM”</h1>
+	<p>- Théodora</p>
+
+	<div class="image-container">
+		<img id="cameraImage" src="_IN/logo.png" alt="Caméra">
+		<video id="cameraVideo" src="_IN/shazam.mp4"></video>
+		<div id="shazamButton"></div>
+	</div>
+
+	<audio id="audioPlayer" src="_SON/melodrama.mp3"></audio>
+
+	<script>
+		const audio = document.getElementById("audioPlayer");
+
+		/* Bouton audio seul */
+		const audioBtn = document.getElementById("audioButton");
+		let audioOnly = false;
+
+		audioBtn.addEventListener("click", () => {
+			if(!audioOnly){
+				audio.currentTime = 0;
+				audio.play();
+				audioBtn.classList.add("playing");
+				audioOnly = true;
+			} else {
+				audio.pause();
+				audio.currentTime = 0;
+				audioBtn.classList.remove("playing");
+				audioOnly = false;
+			}
+		});
+
+		/* Bouton image + vidéo */
+		const shazamBtn = document.getElementById("shazamButton");
+		const img = document.getElementById("cameraImage");
+		const video = document.getElementById("cameraVideo");
+
+		let active = false;
+
+		shazamBtn.addEventListener("click", () => {
+			if(!active){
+				audio.currentTime = 0;
+				audio.play();
+				audioBtn.classList.add("playing");
+
+				img.style.display = "none";
+				video.style.display = "block";
+				video.currentTime = 0;
+				video.play();
+
+				active = true;
+			} else {
+				audio.pause();
+				audio.currentTime = 0;
+				audioBtn.classList.remove("playing");
+
+				video.pause();
+				video.currentTime = 0;
+				video.style.display = "none";
+				img.style.display = "block";
+
+				active = false;
+				audioOnly = false;
+			}
+		});
+	</script>
+
+</body>
+</html>

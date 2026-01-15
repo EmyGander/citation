@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Citation Interactive</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+<style>
+	body{
+		margin: 0;
+		padding: 0;
+		font-family: "Poppins", sans-serif;
+		background-color: black;
+		color: white;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		min-height: 100vh;
+		overflow-x: hidden;
+	}
+
+	.home-btn{
+		position: absolute;
+		top: 20px;
+		right: 30px;
+		font-size: 20px;
+		font-weight: 600;
+		text-decoration: none;
+		color: white;
+	}
+
+	.audio-btn{
+		position: absolute;
+		top: 20px;
+		left: 30px;
+		width: 55px;
+		height: 55px;
+		border-radius: 50%;
+		overflow: hidden;
+		cursor: pointer;
+		border: 2px solid white;
+		background: black;
+		z-index: 10;
+	}
+	.audio-btn img{
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	.audio-btn.playing{
+		animation: spinBtn 3s linear infinite;
+	}
+	@keyframes spinBtn{
+		from { transform: rotate(0deg); }
+		to   { transform: rotate(360deg); }
+	}
+	.audio-btn.playing::after{
+		content: "";
+		position: absolute;
+		top: -8px;
+		left: -8px;
+		width: 70px;
+		height: 70px;
+		border-radius: 50%;
+		border: 3px solid rgba(255,255,255,0.6);
+		animation: rotateHalo 1.3s linear infinite;
+	}
+
+	h1{
+		font-size: clamp(28px, 5vw, 80px);
+		width: 90%;
+		max-width: 900px;
+		text-align: center;
+		line-height: 1.1;
+		margin-top: 120px;
+		margin-bottom: 10px;
+	}
+	p{
+		margin-bottom: 40px;
+	}
+
+	.image-container{
+		position: relative;
+		width: 90%;
+		max-width: 700px;
+		overflow: hidden;
+		border-radius: 25px;
+		margin-bottom: 40px;
+		cursor: pointer;
+	}
+	.image-container img{
+		width: 100%;
+		display: block;
+		border-radius: 25px;
+	}
+	.map {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		border-radius: 25px;
+		opacity: 0;
+		pointer-events: none;
+	}
+
+	.image-container:hover img {
+		opacity: 0;
+	}
+	.image-container:hover .map {
+		opacity: 1;
+		pointer-events: all;
+	}
+
+	.snowflake{
+		position: fixed;
+		top: -50px;
+		color: white;
+		opacity: 0.8;
+		pointer-events: none;
+		animation: fall linear forwards;
+	}
+	@keyframes fall{
+		to{
+			transform: translateY(110vh);
+			opacity: 0;
+		}
+	}
+</style>
+</head>
+<body>
+
+<!-- Audio  -->
+<div class="audio-btn" id="toggleButton">
+	<img src="_IN/yvnnis.jpg" alt="">
+</div>
+
+<a href="index.html" class="home-btn">HOME</a>
+
+<h1>“J'GARDE LE NORD, J'GRATTE SUR LE VÉLIBE, PUIS JE GARD LE VÉLIB VERS GARD DU NORD”</h1>
+<p>- Yvnnis</p>
+
+<div class="image-container" id="mapContainer">
+	<img src="_IN/yvnnis.jpg" alt="Image de fond">
+	<div id="map" class="map"></div>
+</div>
+
+<audio id="audioPlayer" src="_SON/YVNNIS_NORD.mp3"></audio>
+
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<script>
+
+const btn = document.getElementById("toggleButton");
+const audio = document.getElementById("audioPlayer");
+let active = false;
+let snowInterval;
+
+function createSnowflake(){
+	const flake = document.createElement("div");
+	flake.className = "snowflake";
+	flake.innerHTML = "";
+	flake.style.left = Math.random() * window.innerWidth + "px";
+	flake.style.fontSize = 12 + Math.random() * 20 + "px";
+	flake.style.animationDuration = 3 + Math.random() * 4 + "s";
+	document.body.appendChild(flake);
+	setTimeout(() => flake.remove(), 7000);
+}
+
+btn.addEventListener("click", () => {
+	if(!active){
+		audio.currentTime = 0;
+		audio.play().catch(()=>{});
+		snowInterval = setInterval(createSnowflake, 200);
+		btn.classList.add("playing");
+		active = true;
+	} else {
+		audio.pause();
+		audio.currentTime = 0;
+		clearInterval(snowInterval);
+		document.querySelectorAll(".snowflake").forEach(f => f.remove());
+		btn.classList.remove("playing");
+		active = false;
+	}
+});
+
+// chat gpt
+/* ===== Carte Leaflet sur hover ===== */
+let mapInitialized = false;
+const mapContainer = document.getElementById("mapContainer");
+
+mapContainer.addEventListener("mouseenter", () => {
+	if(!mapInitialized){
+		// Initialisation carte centrée Gare du Nord
+		const map = L.map('map').setView([48.8809, 2.3553], 16);
+
+		// Tu peux utiliser OpenStreetMap tiles gratuites
+		L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+			attribution: '&copy; OpenStreetMap contributors'
+		}).addTo(map);
+
+		// Ajouter un marqueur sur Gare du Nord
+		L.marker([48.8809, 2.3553]).addTo(map)
+			.bindPopup('Gare du Nord')
+			.openPopup();
+
+		mapInitialized = true;
+	}
+});
+</script>
+
+</body>
+</html>
